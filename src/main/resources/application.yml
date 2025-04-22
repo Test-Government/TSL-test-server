@@ -1,0 +1,33 @@
+logging:
+  level:
+    eu.europa.esig.dss: WARN
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+      group:
+        readiness:
+          # Comma separated health indicators that affect application readiness state
+          include: readinessState
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    os:
+      enabled: true
+    java:
+      enabled: true
+
+spring:
+  application:
+    name: tsl-server
+  main:
+    banner-mode: off
+  servlet:
+    multipart:
+      # Disable support of multipart uploads
+      enabled: false
