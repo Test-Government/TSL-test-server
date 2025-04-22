@@ -25,6 +25,9 @@ This example builds the application JAR and runs it using the specified addition
 
 By default, the application is accessible on port `8080`, i.e. http://localhost:8080
 
+Usable example configurations, templates and keystores can be found in the [`examples/`](examples) directory.
+For more information see [here](examples/README.md).
+
 ## Configuring the application
 
 The following chapters describe application-specific configuration parameters.

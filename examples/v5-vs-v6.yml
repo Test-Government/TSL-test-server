@@ -1,0 +1,286 @@
+server:
+  port: 8080
+
+tsl:
+  # Helper parameter for specifying the base URL that will be injected into trust lists as other TSL location.
+  # Can be overridden using TSL_BASE_URL environment variable; otherwise falls back to http://localhost:${server.port}
+  base-url: ${TSL_BASE_URL:http://localhost:${server.port}}
+
+  trust-list-factory: # Main implementation classes for TSL entry generation
+    template-factory: ee.test_gov.tsl.server.template.PlaceholderValueProcessingTemplateFactory
+    signer: ee.test_gov.tsl.server.signature.DefaultTrustedListSigner
+    media-type-resolver: ee.test_gov.tsl.server.processor.ApplicationXmlMediaTypeResolver
+
+  trust-lists: # Configuration of individual trust lists
+
+    - serve-as: EE_T-v5-ec.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-tl-EE_T-30.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+
+    - serve-as: EE_T-v5-rsa.xml
+      signer:
+        key-alias: rsa
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA256
+      template:
+        source: file:examples/test-tl-EE_T-30.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+
+    - serve-as: EE_T-v5-unsigned.xml
+      template:
+        source: file:examples/test-tl-EE_T-30.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+
+    - serve-as: EE_T-v6-ec.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV6SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-tl-EE_T-30.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+
+    - serve-as: EE_T-v6-rsa.xml
+      signer:
+        key-alias: rsa
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV6SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA512
+      template:
+        source: file:examples/test-tl-EE_T-30.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+
+    - serve-as: EE_T-v6-unsigned.xml
+      template:
+        source: file:examples/test-tl-EE_T-30.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+
+    - serve-as: lotl-v5-ec.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v5-ec.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v5-v6-mixed-ec.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v6-ec.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v5-ec-rsa-mixed.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:rsa|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v5-rsa.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v5-rsa.xml
+      signer:
+        key-alias: rsa
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA256
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:rsa|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v5-rsa.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v5-v6-mixed-rsa.xml
+      signer:
+        key-alias: rsa
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA256
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:rsa|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v6-rsa.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v5-rsa-ec-mixed.xml
+      signer:
+        key-alias: rsa
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA256
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v5-ec.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v5-unsigned.xml
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v5-unsigned.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v6-ec.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV6SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v6-ec.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v6-v5-mixed-ec.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV6SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v5-ec.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v6-ec-rsa-mixed.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV6SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:rsa|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v6-rsa.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v6-rsa.xml
+      signer:
+        key-alias: rsa
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV6SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA512
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:rsa|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v6-rsa.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v6-v5-mixed-rsa.xml
+      signer:
+        key-alias: rsa
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV6SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA512
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:rsa|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v5-rsa.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v6-rsa-ec-mixed.xml
+      signer:
+        key-alias: rsa
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV6SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA512
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v6-ec.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-v6-unsigned.xml
+      template:
+        source: file:examples/test-lotl-EE-4.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '6'
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T-v6-unsigned.xml
+        placeholder-processors:
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
