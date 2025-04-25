@@ -23,7 +23,7 @@ abstract class AbstractProcessingTemplateFactory implements Function<TemplateCon
         try (InputStream inputStream = configurationProvider.getSource().getInputStream()) {
             template = IOUtils.toString(inputStream, configurationProvider.getCharset());
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to load template: " + configurationProvider.getSource());
+            throw new IllegalStateException("Failed to load template: " + configurationProvider.getSource(), e);
         }
 
         template = processTemplateString(template, configurationProvider);

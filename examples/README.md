@@ -4,6 +4,7 @@ This directory contains the following types of example files.
 
 * [Example configurations](#example-configurations)
   - [v5-vs-v6.yml](#v5-vs-v6yml)
+  - [v5-vs-v6-supply-points.yml](#v5-vs-v6-supply-pointsyml)
   - [v6-identifiers.yml](#v6-identifiersyml)
 * [Keystores and truststores](#keystores-and-truststores)
 * [Trust List template files](#trust-list-template-files)
@@ -98,6 +99,54 @@ Available LOTL-s:
 * http://localhost:8080/lotl-v6-unsigned.xml
   - generated from `test-lotl-EE-4.xml.template` template with version number `6`.
   - points to http://localhost:8080/EE_T-v6-unsigned.xml trusting `CN=Signer EC,OU=TSL,C=EE` signer.
+
+### v5-vs-v6-supply-points.yml
+
+[Configures](v5-vs-v6-supply-points.yml) the TSL server to serve TLv5 and TLv6 trust lists with and without service
+supply point type attributes.
+* By default, the trust lists are served on port `8080`. This can be overridden via the `server.port` parameter.
+* By default, the base URL of other local trust list locations, injected into LOTL-s, is `http://localhost:8080`.
+  This can be overridden via the `TSL_BASE_URL` environment variable.
+
+The application can be run using this configuration from the project root directory via the following command:
+
+```shell
+java -jar target/tsl-test-server-0.1.0-SNAPSHOT.jar --spring.config.additional-location=file:examples/v5-vs-v6-supply-points.yml
+```
+
+Available TLv5 and TLv6 trust lists without service supply point type attributes for reference:
+* http://localhost:8080/lotl-v5-default.xml
+  - generated from `test-lotl-EE-4.xml.template` template with version number `5`.
+  - points to http://localhost:8080/EE_T-v5-default.xml trusting `CN=Signer EC,OU=TSL,C=EE` signer.
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v5 signature parameters and `SHA384` signature digest algorithm.
+* http://localhost:8080/EE_T-v5-default.xml
+  - generated from `test-tl-EE_T-30.xml.template` template with version number `5`.
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v5 signature parameters and `SHA384` signature digest algorithm.
+* http://localhost:8080/lotl-v6-default.xml
+  - generated from `test-lotl-EE-4.xml.template` template with version number `6`.
+  - points to http://localhost:8080/EE_T-v6-default.xml trusting `CN=Signer EC,OU=TSL,C=EE` signer.
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v6 signature parameters and `SHA384` signature digest algorithm.
+* http://localhost:8080/EE_T-v6-default.xml
+  - generated from `test-tl-EE_T-30.xml.template` template with version number `6`.
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v6 signature parameters and `SHA384` signature digest algorithm.
+
+Available TLv5 and TLv6 trust lists with type attribute injected into every existing service supply point element:
+* http://localhost:8080/lotl-v5-default.xml
+  - generated from `test-lotl-EE-4.xml.template` template with version number `5`.
+  - points to http://localhost:8080/EE_T-v5-default.xml trusting `CN=Signer EC,OU=TSL,C=EE` signer.
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v5 signature parameters and `SHA384` signature digest algorithm.
+* http://localhost:8080/EE_T-v5-default.xml
+  - generated from `test-tl-EE_T-30.xml.template` template with version number `5`.
+  - type attribute with matching value to every existing service supply point element (for OCSP and TSP services).
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v5 signature parameters and `SHA384` signature digest algorithm.
+* http://localhost:8080/lotl-v6-default.xml
+  - generated from `test-lotl-EE-4.xml.template` template with version number `6`.
+  - points to http://localhost:8080/EE_T-v6-default.xml trusting `CN=Signer EC,OU=TSL,C=EE` signer.
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v6 signature parameters and `SHA384` signature digest algorithm.
+* http://localhost:8080/EE_T-v6-default.xml
+  - generated from `test-tl-EE_T-30.xml.template` template with version number `6`.
+  - type attribute with matching value to every existing service supply point element (for OCSP and TSP services).
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v6 signature parameters and `SHA384` signature digest algorithm.
 
 ### v6-identifiers.yml
 

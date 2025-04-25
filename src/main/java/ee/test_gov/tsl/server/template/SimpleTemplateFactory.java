@@ -19,7 +19,7 @@ public class SimpleTemplateFactory implements Function<TemplateConfigurationProv
         try (InputStream inputStream = configurationProvider.getSource().getInputStream()) {
             return new InMemoryDocument(inputStream, configurationProvider.getSource().getFilename());
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to load template: " + configurationProvider.getSource());
+            throw new IllegalStateException("Failed to load template: " + configurationProvider.getSource(), e);
         }
     }
 
