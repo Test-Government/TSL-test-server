@@ -158,3 +158,23 @@ The following chapters list available implementing classes for specific interfac
     - Password of the keystore/truststore. Must be prefixed with `pass:`, e.g. `pass:changeit`.
     - Type of the keystore/truststore. Must be prefixed with `type:`, e.g. `type:PKCS12`.
       Defaults to `PKCS12` if type is not specified.
+* `ee.test_gov.tsl.server.processor.KeyStoreResourceToMultipleBase64CertificatesMapper` - loads an arbitrary number of
+  certificates from a keystore/truststore specified in the input string, and returns a list of base64-encoded
+  certificates concatenated into a string.
+  The input string is expected to be a pipe-separated (`|`) list of values,
+  e.g. `file:/path/to/my-truststore.p12|pass:changeit|alias:mycert`.
+  Exactly one such value must define a resource, e.g. `file:/path/to/my-truststore.p12`.
+  Other optional values are as follows:
+  - A comma-separated list of aliases of the certificates to extract. Must be prefixed with `alias:`,
+    e.g. `alias:mycert-1,mycert-2`.
+    Defaults to all certificates in the keystore/truststore if not specified.
+  - Password of the keystore/truststore. Must be prefixed with `pass:`, e.g. `pass:changeit`.
+  - Type of the keystore/truststore. Must be prefixed with `type:`, e.g. `type:PKCS12`.
+    Defaults to `PKCS12` if type is not specified.
+  - Delimiter between individual certificates in the concatenated output string. Must be prefixed with `delimiter:`,
+    e.g. `delimiter:</cert><cert>`.
+    Defaults to an empty string if not specified.
+  - Prefix of the concatenated output string. Must be prefixed with `prefix:`, e.g. `prefix:<certificates><cert>`.
+    Defaults to an empty string if not specified.
+  - Suffix of the concatenated output string. Must be prefixed with `suffix:`, e.g. `suffix:</cert></certificates>`.
+    Defaults to an empty string if not specified.
