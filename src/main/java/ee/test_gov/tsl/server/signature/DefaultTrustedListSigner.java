@@ -17,7 +17,7 @@ import eu.europa.esig.dss.xades.XAdESSignatureParameters;
 import eu.europa.esig.dss.xades.signature.XAdESService;
 import eu.europa.esig.dss.xades.tsl.AbstractTrustedListSignatureParametersBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.event.Level;
 
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class DefaultTrustedListSigner implements BiFunction<DSSDocument, SignerC
 
     private static DSSPrivateKeyEntry getKeyEntry(SignatureTokenConnection signatureToken, String keyAlias) {
         for (DSSPrivateKeyEntry keyEntry : signatureToken.getKeys()) {
-            if (keyAlias == null || (keyEntry instanceof KSPrivateKeyEntry ksEntry && StringUtils.equals(ksEntry.getAlias(), keyAlias))) {
+            if (keyAlias == null || (keyEntry instanceof KSPrivateKeyEntry ksEntry && Strings.CS.equals(ksEntry.getAlias(), keyAlias))) {
                 return keyEntry;
             }
         }

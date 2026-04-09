@@ -3,7 +3,7 @@ package ee.test_gov.tsl.server.template;
 import ee.test_gov.tsl.server.configuration.provider.TemplateConfigurationProvider;
 import ee.test_gov.tsl.server.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Map;
 import java.util.function.UnaryOperator;
@@ -27,7 +27,7 @@ public class PlaceholderValueProcessingTemplateFactory extends AbstractProcessin
                 log.info("Replacing trust list template placeholder '{}' with value '{}'", key, value);
             }
 
-            template = StringUtils.replace(template, key, value);
+            template = Strings.CS.replace(template, key, value);
         }
 
         return template;

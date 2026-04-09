@@ -4,6 +4,7 @@ import ee.test_gov.tsl.server.util.Constants;
 import lombok.Builder;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
@@ -50,12 +51,12 @@ public class KeyStoreResourceToBase64CertificateMapper implements UnaryOperator<
     private static Input parseInput(String inputString) {
         final Input.InputBuilder builder = Input.builder().type(DEFAULT_KEYSTORE_TYPE);
         for (String part : StringUtils.split(inputString, '|')) {
-            if (StringUtils.startsWith(part, ALIAS_PREFIX)) {
-                builder.alias(StringUtils.removeStart(part, ALIAS_PREFIX));
-            } else if (StringUtils.startsWith(part, PASS_PREFIX)) {
-                builder.pass(StringUtils.removeStart(part, PASS_PREFIX).toCharArray());
-            } else if (StringUtils.startsWith(part, TYPE_PREFIX)) {
-                builder.type(StringUtils.removeStart(part, TYPE_PREFIX));
+            if (Strings.CS.startsWith(part, ALIAS_PREFIX)) {
+                builder.alias(Strings.CS.removeStart(part, ALIAS_PREFIX));
+            } else if (Strings.CS.startsWith(part, PASS_PREFIX)) {
+                builder.pass(Strings.CS.removeStart(part, PASS_PREFIX).toCharArray());
+            } else if (Strings.CS.startsWith(part, TYPE_PREFIX)) {
+                builder.type(Strings.CS.removeStart(part, TYPE_PREFIX));
             } else {
                 builder.resource(part);
             }

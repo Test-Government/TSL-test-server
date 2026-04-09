@@ -22,7 +22,7 @@ public class ByteStringResource implements Resource {
     }
 
     @Override
-    public Resource createRelative(String relativePath) {
+    public @NonNull Resource createRelative(@NonNull String relativePath) {
         throw new UnsupportedOperationException();
     }
 
@@ -32,22 +32,22 @@ public class ByteStringResource implements Resource {
     }
 
     @Override
-    public byte[] getContentAsByteArray() {
+    public byte @NonNull [] getContentAsByteArray() {
         return byteString.toByteArray();
     }
 
     @Override
-    public String getContentAsString(Charset charset) {
+    public @NonNull String getContentAsString(@NonNull Charset charset) {
         return byteString.toString(charset);
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "ByteString resource";
     }
 
     @Override
-    public File getFile() {
+    public @NonNull File getFile() {
         throw new UnsupportedOperationException();
     }
 
@@ -57,17 +57,17 @@ public class ByteStringResource implements Resource {
     }
 
     @Override
-    public InputStream getInputStream() {
+    public @NonNull InputStream getInputStream() {
         return byteString.newInput();
     }
 
     @Override
-    public URI getURI() {
+    public @NonNull URI getURI() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public URL getURL() {
+    public @NonNull URL getURL() {
         throw new UnsupportedOperationException();
     }
 
