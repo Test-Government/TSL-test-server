@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>4.0.5</version>
         <relativePath/><!-- Lookup parent from repository. -->
     </parent>
 
@@ -25,13 +25,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.encoding>UTF-8</project.encoding>
 
-        <bouncycastle.version>1.80</bouncycastle.version>
-        <commons-collections4.version>4.4</commons-collections4.version>
-        <dss.version>6.2</dss.version>
-        <protobuf.version>4.30.2</protobuf.version>
-        <wiremock.version>3.12.1</wiremock.version>
+        <bouncycastle.version>1.83</bouncycastle.version>
+        <commons-collections4.version>4.5.0</commons-collections4.version>
+        <dss.version>6.4</dss.version>
+        <protobuf.version>4.34.1</protobuf.version>
+        <wiremock.version>3.13.2</wiremock.version>
 
-        <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
     </properties>
 
     <dependencies><!-- Ordered by scope, groupId, artifactId. -->
