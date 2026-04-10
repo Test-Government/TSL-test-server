@@ -9,6 +9,9 @@ This directory contains the following types of example files.
 * [Keystores and truststores](#keystores-and-truststores)
 * [Trust List template files](#trust-list-template-files)
 
+Additional examples:
+* [Transition period before pivot reset](pivot-transition/README.md)
+
 ## Example configurations
 
 The following subchapters describe specific example configurations.
@@ -231,6 +234,32 @@ All passwords are `changeit`.
     for the `EE_T` territory.
   - `{OTHER_TSL_LOCATION}` as the value of *TrustServiceStatusList* > *SchemeInformation* > *PointersToOtherTSL* >
     *OtherTSLPointer* > *TSLLocation* tag for the `EE_T` territory.
+* [`test-lotl-EE-7-with-pivot-support.xml.template`](test-lotl-EE-7-with-pivot-support.xml.template) contains a modified
+  unsigned copy of the [Estonian test LOTL](https://open-eid.github.io/test-TL/tl-mp-test-EE.xml) that was based on a
+  LOTL with *TSLSequenceNumber* 7.
+  For pivot LOTL support, an additional `<OtherTSLPointer>` has been added into the LOTL to reference itself.
+  The template contains the following placeholders:
+  - `{TSL_VERSION_IDENTIFIER}` as the value of *TrustServiceStatusList* > *SchemeInformation* > *TSLVersionIdentifier*
+    tag.
+  - `{TSL_SEQUENCE_NUMBER}` as the value of *TrustServiceStatusList* > *SchemeInformation* > *TSLSequenceNumber* tag.
+  - `{SCHEME_INFORMATION_URI_LIST}` as the contents of *TrustServiceStatusList* > *SchemeInformation* >
+    *SchemeInformationURI* tag.
+  - `{LOTL_DIGITAL_IDENTITIES_LIST}` as the contents of *ServiceDigitalIdentities* tag inside the first
+    *TrustServiceStatusList* > *SchemeInformation* > *PointersToOtherTSL* > *OtherTSLPointer* block that references
+    the LOTL itself.
+  - `{LOTL_LOCATION}` as the value of *TSLLocation* tag inside the first *TrustServiceStatusList* > *SchemeInformation* 
+    \> *PointersToOtherTSL* > *OtherTSLPointer* block that references the LOTL itself.
+  - `{OTHER_TSL_CERTIFICATE_B64}` as the value of *ServiceDigitalIdentities* > *ServiceDigitalIdentity* > *DigitalId* >
+    *X509Certificate* tag inside the second *TrustServiceStatusList* > *SchemeInformation* > *PointersToOtherTSL* >
+    *OtherTSLPointer* block that references the trusted list for the `EE_T` territory.
+  - `{OTHER_TSL_LOCATION}` as the value of *TSLLocation* tag inside the second *TrustServiceStatusList* >
+    *SchemeInformation* > *PointersToOtherTSL* > *OtherTSLPointer* block that references the trusted list for the
+    `EE_T` territory.
+  - `{LIST_ISSUE_DATE_TIME}` as the value of *TrustServiceStatusList* > *SchemeInformation* > *ListIssueDateTime* tag.
+  - `{NEXT_UPDATE_DATE_TIME}` as the value of *TrustServiceStatusList* > *SchemeInformation* > *NextUpdate* >
+    *dateTime* tag.
+  - `{DISTRIBUTION_POINTS_URI}` as the value of *TrustServiceStatusList* > *SchemeInformation* > *DistributionPoints* >
+    *URI* tag.
 * [`test-tl-EE_T-30.xml.template`](test-tl-EE_T-30.xml.template) contains an unsigned copy of the
   [Estonian test trust list](https://open-eid.github.io/test-TL/EE_T.xml) with *TSLSequenceNumber* 30.
   The template contains the following placeholder:

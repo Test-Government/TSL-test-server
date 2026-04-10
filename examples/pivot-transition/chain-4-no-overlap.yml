@@ -1,0 +1,169 @@
+server:
+  port: 8080
+
+tsl:
+  # Helper parameter for specifying the base URL that will be injected into trust lists as other TSL location.
+  # Can be overridden using TSL_BASE_URL environment variable; otherwise falls back to http://localhost:${server.port}
+  base-url: ${TSL_BASE_URL:http://localhost:${server.port}}
+
+  trust-list-factory: # Main implementation classes for TSL entry generation
+    template-factory: ee.test_gov.tsl.server.template.PlaceholderValueProcessingTemplateFactory
+    signer: ee.test_gov.tsl.server.signature.DefaultTrustedListSigner
+    media-type-resolver: ee.test_gov.tsl.server.processor.ApplicationXmlMediaTypeResolver
+
+  trust-lists: # Configuration of individual trust lists
+
+    - serve-as: EE_T.xml
+      signer:
+        key-alias: ec
+        keystore: file:examples/signer.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+      template:
+        source: file:examples/test-tl-EE_T-30.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+
+    # 4-LOTL chain: 3 previous pivot LOTLs and a current LOTL.
+    # No overlap between the first set of LOTL signing certificates (the first pivot LOTL after the first OJ URI)
+    #  and the set used after the second OJ URI.
+
+    - serve-as: lotl-pivot-1.xml
+      signer:
+        key-alias: signer-1
+        keystore: file:examples/pivot-transition/numbered-signers.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA256
+        claimed-signing-time: 2025-01-01T00:00:01Z
+      template:
+        source: file:examples/test-lotl-EE-7-with-pivot-support.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{TSL_SEQUENCE_NUMBER}]': '1'
+          '[{SCHEME_INFORMATION_URI_LIST}]': >-
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-1.xml</URI>
+            <URI xml:lang="en">https://oj/legal-content/EN/TXT/?uri=uriserv:old_OJ_URI.ENG</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-legalnotice.html#en</URI>
+            <URI xml:lang="et">${tsl.base-url}/lotl-legalnotice.html#et</URI>
+          '[{LOTL_DIGITAL_IDENTITIES_LIST}]': "\
+            file:examples/pivot-transition/numbered-signers-1-2.truststore.p12|pass:changeit|\
+            prefix:<ServiceDigitalIdentity><DigitalId><X509Certificate>|\
+            delimiter:</X509Certificate></DigitalId></ServiceDigitalIdentity><ServiceDigitalIdentity><DigitalId><X509Certificate>|\
+            suffix:</X509Certificate></DigitalId></ServiceDigitalIdentity>"
+          '[{LOTL_LOCATION}]': ${tsl.base-url}/lotl.xml
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T.xml
+          '[{LIST_ISSUE_DATE_TIME}]': 2025-01-01T00:00:01Z
+          '[{NEXT_UPDATE_DATE_TIME}]': 2026-01-01T23:59:59Z
+          '[{DISTRIBUTION_POINTS_URI}]': ${tsl.base-url}/lotl.xml
+        placeholder-processors:
+          '[{LOTL_DIGITAL_IDENTITIES_LIST}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToMultipleBase64CertificatesMapper
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-pivot-2.xml
+      signer:
+        key-alias: signer-2
+        keystore: file:examples/pivot-transition/numbered-signers.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA256
+        claimed-signing-time: 2026-01-01T00:00:00Z
+      template:
+        source: file:examples/test-lotl-EE-7-with-pivot-support.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{TSL_SEQUENCE_NUMBER}]': '2'
+          '[{SCHEME_INFORMATION_URI_LIST}]': >-
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-2.xml</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-1.xml</URI>
+            <URI xml:lang="en">https://oj/legal-content/EN/TXT/?uri=uriserv:old_OJ_URI.ENG</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-legalnotice.html#en</URI>
+            <URI xml:lang="et">${tsl.base-url}/lotl-legalnotice.html#et</URI>
+          '[{LOTL_DIGITAL_IDENTITIES_LIST}]': "\
+            file:examples/pivot-transition/numbered-signers-2-3.truststore.p12|pass:changeit|\
+            prefix:<ServiceDigitalIdentity><DigitalId><X509Certificate>|\
+            delimiter:</X509Certificate></DigitalId></ServiceDigitalIdentity><ServiceDigitalIdentity><DigitalId><X509Certificate>|\
+            suffix:</X509Certificate></DigitalId></ServiceDigitalIdentity>"
+          '[{LOTL_LOCATION}]': ${tsl.base-url}/lotl.xml
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T.xml
+          '[{LIST_ISSUE_DATE_TIME}]': 2026-01-01T00:00:00Z
+          '[{NEXT_UPDATE_DATE_TIME}]': 2026-04-09T12:00:00Z
+          '[{DISTRIBUTION_POINTS_URI}]': ${tsl.base-url}/lotl.xml
+        placeholder-processors:
+          '[{LOTL_DIGITAL_IDENTITIES_LIST}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToMultipleBase64CertificatesMapper
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl-pivot-3.xml
+      signer:
+        key-alias: signer-3
+        keystore: file:examples/pivot-transition/numbered-signers.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+        claimed-signing-time: 2026-04-09T00:00:00Z
+      template:
+        source: file:examples/test-lotl-EE-7-with-pivot-support.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{TSL_SEQUENCE_NUMBER}]': '3'
+          '[{SCHEME_INFORMATION_URI_LIST}]': >-
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-3.xml</URI>
+            <URI xml:lang="en">https://oj/legal-content/EN/TXT/?uri=uriserv:new_OJ_URI.ENG</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-2.xml</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-1.xml</URI>
+            <URI xml:lang="en">https://oj/legal-content/EN/TXT/?uri=uriserv:old_OJ_URI.ENG</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-legalnotice.html#en</URI>
+            <URI xml:lang="et">${tsl.base-url}/lotl-legalnotice.html#et</URI>
+          '[{LOTL_DIGITAL_IDENTITIES_LIST}]': "\
+            file:examples/pivot-transition/numbered-signers-3-4.truststore.p12|pass:changeit|\
+            prefix:<ServiceDigitalIdentity><DigitalId><X509Certificate>|\
+            delimiter:</X509Certificate></DigitalId></ServiceDigitalIdentity><ServiceDigitalIdentity><DigitalId><X509Certificate>|\
+            suffix:</X509Certificate></DigitalId></ServiceDigitalIdentity>"
+          '[{LOTL_LOCATION}]': ${tsl.base-url}/lotl.xml
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T.xml
+          '[{LIST_ISSUE_DATE_TIME}]': 2026-04-09T00:00:00Z
+          '[{NEXT_UPDATE_DATE_TIME}]': 2026-12-31T23:59:59Z
+          '[{DISTRIBUTION_POINTS_URI}]': ${tsl.base-url}/lotl.xml
+        placeholder-processors:
+          '[{LOTL_DIGITAL_IDENTITIES_LIST}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToMultipleBase64CertificatesMapper
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
+
+    - serve-as: lotl.xml
+      signer:
+        key-alias: signer-4
+        keystore: file:examples/pivot-transition/numbered-signers.keystore.p12
+        keystore-password: changeit
+        signature-parameters-builder: ee.test_gov.tsl.server.signature.TrustedListV5SignatureParametersBuilderFactory
+        signature-digest-algorithm: SHA384
+        claimed-signing-time: 2026-04-09T12:00:00Z
+      template:
+        source: file:examples/test-lotl-EE-7-with-pivot-support.xml.template
+        placeholder-mappings:
+          '[{TSL_VERSION_IDENTIFIER}]': '5'
+          '[{TSL_SEQUENCE_NUMBER}]': '4'
+          '[{SCHEME_INFORMATION_URI_LIST}]': >-
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-3.xml</URI>
+            <URI xml:lang="en">https://oj/legal-content/EN/TXT/?uri=uriserv:new_OJ_URI.ENG</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-2.xml</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-pivot-1.xml</URI>
+            <URI xml:lang="en">https://oj/legal-content/EN/TXT/?uri=uriserv:old_OJ_URI.ENG</URI>
+            <URI xml:lang="en">${tsl.base-url}/lotl-legalnotice.html#en</URI>
+            <URI xml:lang="et">${tsl.base-url}/lotl-legalnotice.html#et</URI>
+          '[{LOTL_DIGITAL_IDENTITIES_LIST}]': "\
+            file:examples/pivot-transition/numbered-signers-4-5.truststore.p12|pass:changeit|\
+            prefix:<ServiceDigitalIdentity><DigitalId><X509Certificate>|\
+            delimiter:</X509Certificate></DigitalId></ServiceDigitalIdentity><ServiceDigitalIdentity><DigitalId><X509Certificate>|\
+            suffix:</X509Certificate></DigitalId></ServiceDigitalIdentity>"
+          '[{LOTL_LOCATION}]': ${tsl.base-url}/lotl.xml
+          '[{OTHER_TSL_CERTIFICATE_B64}]': file:examples/signer.truststore.p12|alias:ec|pass:changeit
+          '[{OTHER_TSL_LOCATION}]': ${tsl.base-url}/EE_T.xml
+          '[{LIST_ISSUE_DATE_TIME}]': 2026-04-09T12:00:00Z
+          '[{NEXT_UPDATE_DATE_TIME}]': 2030-12-31T23:59:59Z
+          '[{DISTRIBUTION_POINTS_URI}]': ${tsl.base-url}/lotl.xml
+        placeholder-processors:
+          '[{LOTL_DIGITAL_IDENTITIES_LIST}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToMultipleBase64CertificatesMapper
+          '[{OTHER_TSL_CERTIFICATE_B64}]': ee.test_gov.tsl.server.processor.KeyStoreResourceToBase64CertificateMapper
