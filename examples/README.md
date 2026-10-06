@@ -6,6 +6,7 @@ This directory contains the following types of example files.
   - [v5-vs-v6.yml](#v5-vs-v6yml)
   - [v5-vs-v6-supply-points.yml](#v5-vs-v6-supply-pointsyml)
   - [v6-identifiers.yml](#v6-identifiersyml)
+  - [sk-ocsp-2011-withdrawn.yml](#sk-ocsp-2011-withdrawnyml)
 * [Keystores and truststores](#keystores-and-truststores)
 * [Trust List template files](#trust-list-template-files)
 
@@ -200,6 +201,31 @@ Available trust lists with all trust service type identifiers replaced by new TL
     identifiers.
   - signed by `CN=Signer EC,OU=TSL,C=EE` using v6 signature parameters and `SHA384` signature digest algorithm.
 
+### sk-ocsp-2011-withdrawn.yml
+
+[Configures](sk-ocsp-2011-withdrawn.yml) the TSL server to serve TLv6 trust lists where the
+"*TEST of SK OCSP RESPONDER 2011*" service has been withdrawn since `2026-01-01T00:00:00Z`.
+Its previous `granted` status (since `2016-06-30T22:00:00Z`) is preserved in the service history, so validation of
+OCSP responses produced before the withdrawal should not be affected.
+* By default, the trust lists are served on port `8080`. This can be overridden via the `server.port` parameter.
+* By default, the base URL of other local trust list locations, injected into LOTL-s, is `http://localhost:8080`.
+  This can be overridden via the `TSL_BASE_URL` environment variable.
+
+The application can be run using this configuration from the project root directory via the following command:
+
+```shell
+java -jar target/tsl-test-server-0.1.0-SNAPSHOT.jar --spring.config.additional-location=file:examples/sk-ocsp-2011-withdrawn.yml
+```
+
+Available trust lists:
+* http://localhost:8080/lotl-v6-sk-ocsp-2011-withdrawn.xml
+  - generated from `test-lotl-EE-4.xml.template` template with version number `6`.
+  - points to http://localhost:8080/EE_T-v6-sk-ocsp-2011-withdrawn.xml trusting `CN=Signer EC,OU=TSL,C=EE` signer.
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v6 signature parameters and `SHA384` signature digest algorithm.
+* http://localhost:8080/EE_T-v6-sk-ocsp-2011-withdrawn.xml
+  - generated from `test-tl-EE_T-31-sk-ocsp-2011-withdrawn.xml.template` template with version number `6`.
+  - signed by `CN=Signer EC,OU=TSL,C=EE` using v6 signature parameters and `SHA384` signature digest algorithm.
+
 ## Keystores and truststores
 
 * Keystore `signer.keystore.p12` and truststore `signer.truststore.p12` contain the following signers:
@@ -262,6 +288,16 @@ All passwords are `changeit`.
     *URI* tag.
 * [`test-tl-EE_T-30.xml.template`](test-tl-EE_T-30.xml.template) contains an unsigned copy of the
   [Estonian test trust list](https://open-eid.github.io/test-TL/EE_T.xml) with *TSLSequenceNumber* 30.
+  The template contains the following placeholder:
+  - `{TSL_VERSION_IDENTIFIER}` as the value of *TrustServiceStatusList* > *SchemeInformation* > *TSLVersionIdentifier*
+    tag.
+* [`test-tl-EE_T-31-sk-ocsp-2011-withdrawn.xml.template`](test-tl-EE_T-31-sk-ocsp-2011-withdrawn.xml.template) contains
+  a modified copy of [`test-tl-EE_T-30.xml.template`](test-tl-EE_T-30.xml.template) with the following changes:
+  - *TSLSequenceNumber* is `31` and *ListIssueDateTime* is `2026-10-06T00:00:00Z`.
+  - The service named "*TEST of SK OCSP RESPONDER 2011*" has *ServiceStatus* `withdrawn` with *StatusStartingTime*
+    `2026-01-01T00:00:00Z`; its previous `granted` status (since `2016-06-30T22:00:00Z`) has been added as the most
+    recent *ServiceHistoryInstance*.
+
   The template contains the following placeholder:
   - `{TSL_VERSION_IDENTIFIER}` as the value of *TrustServiceStatusList* > *SchemeInformation* > *TSLVersionIdentifier*
     tag.
